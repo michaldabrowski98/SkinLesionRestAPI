@@ -1,6 +1,5 @@
 from uvicorn import run
 from typing import List
-# from pydantic import BaseModel
 from fastapi import FastAPI
 import os
 import tensorflow as tf
@@ -27,16 +26,19 @@ def classify(image: Image):
     if image_url == "":
         return {'message': 'No image provided'}
     
+    return { 'name' : get_prediction(image_url)}
+
+def get_prediction(image_url: str) -> str:
     req = urllib.request.urlopen(image_url)
     arr = np.asarray(bytearray(req.read()), dtype=np.uint8)
     img = cv2.imdecode(arr, -1)
     test_image = cv2.resize(img, (IMG_SIZE , IMG_SIZE))
     test_image = np.array(test_image).reshape( -1, IMG_SIZE, IMG_SIZE, 3)
     prediction = model.predict({'conv2d_14_input': test_image })
-    
+
     return get_skin_condition(prediction[0])
 
-def get_skin_condition(prediction: List[float]):
+def get_skin_condition(prediction: List[float]) -> str:
     maxIndex = 0
     max = prediction[maxIndex]
     for i in range(1, len(prediction)):
