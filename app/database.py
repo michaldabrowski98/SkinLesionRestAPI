@@ -1,14 +1,21 @@
+import os
+from dotenv import load_dotenv
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
-from pydantic_settings import SettingsConfigDict
 
-model_config = SettingsConfigDict(env_file=".env")
+load_dotenv()
 
-SQLALCHEMY_DATABASE_URL = ""
+SQLALCHEMY_DATABASE_URL = "mysql+mysqlconnector://{user}:{password}@{url}:{port}/{name}".format(
+    user=os.getenv('DATABASE_USER'), 
+    password=os.getenv('DATABASE_PASSWORD'),
+    url=os.getenv('DATABASE_URL'),
+    port=os.getenv('DATABASE_PORT'),
+    name=os.getenv('DATABASE_NAME')
+)
 
 engine = create_engine(
-    SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False}
+    SQLALCHEMY_DATABASE_URL
 )
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
